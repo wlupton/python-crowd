@@ -653,9 +653,12 @@ class CrowdServer(object):
             }
         }
 
+        # XXX WL added start-index and max-results (defaults to 1000)
         params = {
             'entity-type': entity_type,
             'expand': entity_type,
+            'start-index': 0,
+            'max-results': 99999
         }
         # Construct XML payload of the form:
         # <property-search-restriction>
