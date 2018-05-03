@@ -625,7 +625,8 @@ class CrowdServer(object):
         if not response.ok:
             return None
 
-        return (response.json()['description'], response.json()['active'])
+        json_ = response.json()
+        return (json_.get('description', ''), json_.get('active', True))
 
     def get_groups(self, username):
         """Retrieves a list of group names that have <username> as a direct member.
