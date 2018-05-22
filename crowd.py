@@ -585,6 +585,7 @@ class CrowdServer(object):
         """
         # Populate data with default values.
         data = {"name": groupname,
+                "type": "GROUP",
                 "description": "",
                 "active": True}
 
