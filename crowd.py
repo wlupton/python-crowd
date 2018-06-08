@@ -629,6 +629,26 @@ class CrowdServer(object):
         json_ = response.json()
         return (json_.get('description', ''), json_.get('active', True))
 
+    # WL added this
+    def get_child_groups(self, groupname):
+        """Retrieves a list of group names that are direct children of <groupname>.
+
+        Args:
+            groupname: The group name.
+
+        Returns:
+            list:
+                A list of strings of group names.
+        """
+
+        response = self._get(self.rest_url + "/group/child-group/direct",
+                             params={"groupname": groupname})
+
+        if not response.ok:
+            return None
+
+        return [g['name'] for g in response.json()['groups']]
+
     def get_groups(self, username):
         """Retrieves a list of group names that have <username> as a direct member.
 
