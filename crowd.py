@@ -546,28 +546,6 @@ class CrowdServer(object):
 
         return False
 
-    def get_nested_group_users(self, groupname):
-        """Retrieves a list of all users that directly or indirectly belong
-        to the given groupname.
-
-        Args:
-            groupname: The group name.
-
-
-        Returns:
-            list:
-                A list of strings of user names.
-        """
-
-        response = self._get(self.rest_url + "/group/user/nested",
-                             params={"groupname": groupname, "start-index": 0,
-                                     "max-results": 99999})
-
-        if not response.ok:
-            return None
-
-        return [u['name'] for u in response.json()['users']]
-
     # WL added this
     def add_group(self, groupname, raise_on_error=False, **kwargs):
         """Add a group to the directory
@@ -630,7 +608,7 @@ class CrowdServer(object):
         return (json_.get('description', ''), json_.get('active', True))
 
     # WL added this
-    def get_child_groups(self, groupname):
+    def get_direct_child_groups(self, groupname):
         """Retrieves a list of group names that are direct children of <groupname>.
 
         Args:
@@ -642,12 +620,37 @@ class CrowdServer(object):
         """
 
         response = self._get(self.rest_url + "/group/child-group/direct",
-                             params={"groupname": groupname})
+                             params={"groupname": groupname,
+                                     "start-index": 0,
+                                     "max-results": 99999})
 
         if not response.ok:
             return None
 
         return [g['name'] for g in response.json()['groups']]
+
+    # WL added this
+    def get_direct_child_users(self, groupname):
+        """Retrieves a list of user names that are direct children of
+        <groupname>.
+
+        Args:
+            groupname: The group name.
+
+        Returns:
+            list:
+                A list of strings of user names.
+        """
+
+        response = self._get(self.rest_url + "/group/user/direct",
+                             params={"groupname": groupname,
+                                     "start-index": 0,
+                                     "max-results": 99999})
+
+        if not response.ok:
+            return None
+
+        return [g['name'] for g in response.json()['users']]
 
     def get_groups(self, username):
         """Retrieves a list of group names that have <username> as a direct member.
@@ -685,7 +688,6 @@ class CrowdServer(object):
 
         return [g['name'] for g in response.json()['groups']]
 
-    # WL added this
     def get_nested_group_users(self, groupname):
         """Retrieves a list of all users that directly or indirectly belong to the given groupname.
 
