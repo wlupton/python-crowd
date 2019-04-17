@@ -430,8 +430,60 @@ class CrowdServer(object):
 
         return None
 
+    # XXX this and set_active() should use common update_user() method
+    def set_email(self, username, email):
+        """Set the email of a user
+
+        Args:
+            username: The account username
+            email: The email address
+
+        Returns:
+            True: If successful
+            None: If no user or failure occurred
+        """
+
+        user = self.get_user(username)
+        if user is None:
+            return None
+
+        if user['email'] == email:
+            # Already in desired state
+            return True
+
+        user['email'] = email
+        response = self._put(self.rest_url + "/user",
+                             params={"username": username},
+                             data=json.dumps(user))
+
+        if response.status_code == 204:
+            return True
+
+        return None
+
+    def rename_user(self, username, new_name, raise_on_error=False):
+        """Rename a user
+        :param username: The username to rename
+        :param new_name: The new username
+        :return: True on success, False on failure.
+        """
+        data = {
+            'new-name': new_name
+        }
+        response = self._post(self.rest_url + "/user/rename",
+                              params={"username": username},
+                              data=json.dumps(data))
+
+        if response.status_code == 200:
+            return True
+
+        if raise_on_error:
+            raise RuntimeError(response.json()['message'])
+
+        return False
+
     def set_user_attribute(self, username, attribute, value, raise_on_error=False):
-        """Set an attribute on  a user
+        """Set an attribute on a user
         :param username: The username on which to set the attribute
         :param attribute: The name of the attribute to set
         :param value: The value of the attribute to set
@@ -448,7 +500,7 @@ class CrowdServer(object):
             ]
         }
         response = self._post(self.rest_url + "/user/attribute",
-                              params={"username": username,},
+                              params={"username": username},
                               data=json.dumps(data))
 
         if response.status_code == 204:
